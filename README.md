@@ -19,6 +19,18 @@ The HTML page includes a **Source Code** button that opens `https://github.com/B
 
 Open `index.html` in a browser, paste a SandboxCode, click **Decode input**, edit values by category, then copy the generated code.
 
+The browser page also supports shareable links. The current generated code is written into the URL as `?code=...`, so browser links can pass settings around directly. Opening a link like `index.html?code=AAAGCDA` loads that code automatically. The **Copy share link** button copies the current page URL with the latest generated SandboxCode.
+
+Accepted URL forms:
+
+```text
+?code=AAAJABJACJADJARFBNC
+?sandbox=AAAJABJACJADJARFBNC
+?sandboxcode=AAAJABJACJADJARFBNC
+#AAAJABJACJADJARFBNC
+#code=AAAJABJACJADJARFBNC
+```
+
 The browser page uses category tabs/cards instead of one long settings table. Unknown blocks are shown separately and preserved when the **keep unknown blocks** checkbox is enabled.
 
 ## Python CLI use
@@ -106,5 +118,19 @@ The game title, setting names, and trademarks belong to their owners. This proje
 
 ## HTML design note
 
-The `index.html` page uses a compact dark grey / black in-game style layout inspired by the 7 Days to Die sandbox options screen. Settings are grouped by category instead of shown as one long list. The whole page is scaled to 110% with a single `--site-zoom` CSS variable near the top of the file.
+The `index.html` page uses a compact dark grey / black in-game style layout inspired by the 7 Days to Die sandbox options screen. Settings are grouped by category instead of shown as one long list. The whole page is scaled to 110% with a single `--site-zoom` CSS variable near the top of the file. The page also supports URL sharing through the `code` query parameter.
+
+## URL sharing
+
+Supported URL forms:
+
+```text
+?code=AAAGCDA
+?sandboxcode=AAAGCDA
+?sandbox=AAAGCDA
+#code=AAAGCDA
+#AAAGCDA
+```
+
+The page writes the latest generated code back to `?code=...` with `history.replaceState`, so editing a setting does not create a long browser-back history chain.
 
