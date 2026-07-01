@@ -13,6 +13,8 @@ No build step. No third-party Python packages. No game files or game assets are 
 
 Put this repository on GitHub, then enable Pages for the repository root or the branch root. The `index.html` file is already at the root, so GitHub Pages can serve it directly.
 
+The HTML page includes a **Source Code** button that opens `https://github.com/BoQsc/7dtd-sandbox-code-tools`.
+
 ## Browser use
 
 Open `index.html` in a browser, paste a SandboxCode, click **Decode input**, edit values by category, then copy the generated code.
@@ -105,3 +107,4 @@ The game title, setting names, and trademarks belong to their owners. This proje
 ## HTML design note
 
 The `index.html` page uses a compact dark grey / black in-game style layout inspired by the 7 Days to Die sandbox options screen. Settings are grouped by category instead of shown as one long list. The whole page is scaled to 110% with a single `--site-zoom` CSS variable near the top of the file.
+

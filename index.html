@@ -70,7 +70,7 @@ main { position:relative; max-width:1120px; margin:0 auto; padding:78px 18px 26p
   box-shadow:0 2px 0 rgba(255,255,255,.18) inset, 0 18px 42px rgba(0,0,0,.45);
 }
 .hero::before { display:none; }
-.hero-content { display:block; }
+.hero-content { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .hero h1 {
   margin:0;
   font-size:22px;
@@ -79,6 +79,25 @@ main { position:relative; max-width:1120px; margin:0 auto; padding:78px 18px 26p
   text-transform:none;
 }
 .hero p, .badges { display:none; }
+.source-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:30px;
+  padding:5px 12px;
+  border:2px solid #bfbfbf;
+  background:#151515;
+  color:#f1f1f1;
+  text-decoration:none;
+  text-transform:uppercase;
+  font-size:15px;
+  font-weight:700;
+  line-height:1;
+  box-shadow:inset 0 0 0 1px #000, 0 1px 0 rgba(255,255,255,.14);
+  white-space:nowrap;
+}
+.source-button:hover { background:#222; color:#fff; }
+
 .chrome {
   margin-top:0;
   border:2px solid var(--line);
@@ -366,6 +385,7 @@ button.secondary {
         <h1>Sandbox Options</h1>
         <p>Decode a SandboxCode, edit settings by category, then copy the generated code.</p>
       </div>
+      <a class="source-button" href="https://github.com/BoQsc/7dtd-sandbox-code-tools" target="_blank" rel="noopener noreferrer">Source Code</a>
       <div class="badges">
         <span class="badge">GitHub Pages ready</span>
         <span class="badge">No build step</span>
