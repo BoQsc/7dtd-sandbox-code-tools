@@ -15,9 +15,9 @@ Put this repository on GitHub, then enable Pages for the repository root or the 
 
 ## Browser use
 
-Open `index.html` in a browser, paste a SandboxCode, click **Decode input**, edit values, then copy the generated code.
+Open `index.html` in a browser, paste a SandboxCode, click **Decode input**, edit values by category, then copy the generated code.
 
-Unknown blocks are shown separately and preserved when the **keep unknown blocks** checkbox is enabled.
+The browser page uses category tabs/cards instead of one long settings table. Unknown blocks are shown separately and preserved when the **keep unknown blocks** checkbox is enabled.
 
 ## Python CLI use
 
@@ -100,3 +100,8 @@ NOTICE.md                          Unofficial/trademark/legal notes
 The scripts, HTML, README, and packaging files in this repository are released under the MIT License. See `LICENSE`.
 
 The game title, setting names, and trademarks belong to their owners. This project is unofficial and is not affiliated with The Fun Pimps.
+
+
+## HTML design note
+
+The `index.html` page uses a compact dark grey / black in-game style layout inspired by the 7 Days to Die sandbox options screen. Settings are grouped by category instead of shown as one long list. The whole page is scaled to 110% with a single `--site-zoom` CSS variable near the top of the file.

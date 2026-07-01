@@ -5,79 +5,463 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>7 Days to Die SandboxCode Tool</title>
 <style>
-:root { color-scheme: dark; --bg:#111418; --panel:#181d23; --line:#303945; --text:#e8eef7; --muted:#a9b4c1; --accent:#c9d7ff; --bad:#ffb3b3; }
-* { box-sizing: border-box; }
-body { margin: 0; font-family: system-ui, Segoe UI, Arial, sans-serif; background: var(--bg); color: var(--text); }
-main { max-width: 1200px; margin: 0 auto; padding: 22px; }
-h1 { margin: 0 0 6px; font-size: 24px; }
-p { color: var(--muted); line-height: 1.45; }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 14px 0; }
-textarea, input, select, button { font: inherit; }
-textarea, input, select { width: 100%; background:#0e1116; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:9px; }
-textarea { min-height: 76px; resize: vertical; font-family: ui-monospace, Consolas, monospace; }
-button { background:#263044; color:var(--text); border:1px solid #52627a; border-radius:8px; padding:9px 12px; cursor:pointer; }
-button:hover { background:#303b52; }
-.row { display:grid; grid-template-columns: 1fr; gap:10px; }
-.buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-.status { min-height: 22px; color: var(--accent); }
-.status.bad { color: var(--bad); }
-table { width:100%; border-collapse: collapse; font-size: 14px; }
-th, td { border-bottom:1px solid var(--line); padding:7px 6px; vertical-align: middle; }
-th { text-align:left; color:var(--muted); position: sticky; top: 0; background: var(--panel); z-index:1; }
-td.code { font-family: ui-monospace, Consolas, monospace; color:#dce7ff; white-space:nowrap; }
-.changed td { background: rgba(201,215,255,0.06); }
-.unknown td { background: rgba(255,179,179,0.08); }
-.small { font-size: 13px; color: var(--muted); }
-@media (min-width: 850px) { .row { grid-template-columns: 1fr 1fr; } }
+/* Readability pass: avoid Impact + ultra-bold weights because it creates doubled, blurry text on Windows browsers. */
+:root {
+  color-scheme: dark;
+  --background:#111517;
+  --ice1:rgba(180,210,220,.22);
+  --ice2:rgba(80,105,120,.25);
+  --black:#050505;
+  --panel:#3f3f3f;
+  --panel2:#363636;
+  --panel3:#2b2b2b;
+  --line:#000000;
+  --edge:#777777;
+  --text:#b8b8b8;
+  --text2:#d8d8d8;
+  --muted:#8d8d8d;
+  --red:#e01818;
+  --red2:#ff2525;
+  --yellow:#d2b45f;
+  --green:#89c36b;
+  --site-zoom:1.10;
+}
+* { box-sizing:border-box; }
+html { min-height:100%; }
+body {
+  min-height:100%;
+  margin:0;
+  background:
+    radial-gradient(circle at 12% 18%, var(--ice1), transparent 240px),
+    radial-gradient(circle at 86% 10%, rgba(210,230,235,.16), transparent 260px),
+    radial-gradient(circle at 78% 82%, rgba(120,70,55,.18), transparent 280px),
+    linear-gradient(135deg, #1f2a2e, #131719 48%, #24282a);
+  color:var(--text);
+  font-family:"Arial Narrow", "Roboto Condensed", "Segoe UI Condensed", Tahoma, Arial, sans-serif;
+  font-weight:600;
+  letter-spacing:.1px;
+  text-shadow:0 1px 1px rgba(0,0,0,.75);
+  font-synthesis:none;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+  zoom:var(--site-zoom);
+}
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(120deg, rgba(255,255,255,.035) 0 1px, transparent 1px 9px),
+    radial-gradient(circle at top, rgba(255,255,255,.14), transparent 360px);
+  mix-blend-mode:screen;
+  opacity:.7;
+}
+a { color:#d7d7d7; }
+code, .mono { font-family:"Lucida Console", Consolas, ui-monospace, monospace; letter-spacing:0; }
+main { position:relative; max-width:1120px; margin:0 auto; padding:78px 18px 26px; }
+.hero {
+  border:2px solid var(--line);
+  border-bottom:0;
+  border-radius:0;
+  background:#000;
+  color:#e8e8e8;
+  padding:7px 10px 6px;
+  box-shadow:0 2px 0 rgba(255,255,255,.18) inset, 0 18px 42px rgba(0,0,0,.45);
+}
+.hero::before { display:none; }
+.hero-content { display:block; }
+.hero h1 {
+  margin:0;
+  font-size:22px;
+  line-height:1;
+  font-weight:700;
+  text-transform:none;
+}
+.hero p, .badges { display:none; }
+.chrome {
+  margin-top:0;
+  border:2px solid var(--line);
+  border-radius:0;
+  background:var(--panel);
+  box-shadow:0 22px 55px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.16);
+  padding:10px 12px 14px;
+  min-height:520px;
+}
+.toolbar {
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:0 0 10px;
+  box-shadow:none;
+}
+.io-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+.field-title {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#d0d0d0;
+  font-size:16px;
+  font-weight:700;
+  margin:0 0 5px;
+  text-transform:uppercase;
+}
+.field-title .mono { color:#898989; font-size:11px; }
+textarea, input, select, button { font:inherit; }
+textarea, input, select {
+  width:100%;
+  border:1px solid #777;
+  border-radius:0;
+  background:#2f2f2f;
+  color:#c2c2c2;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.8), 0 1px 0 rgba(255,255,255,.14);
+  text-shadow:0 1px 1px #000;
+}
+textarea {
+  min-height:38px;
+  resize:vertical;
+  padding:9px 10px;
+  font-family:"Lucida Console", Consolas, ui-monospace, monospace;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:0;
+}
+input { padding:8px 9px; font-size:15px; }
+select {
+  width:auto;
+  min-width:88px;
+  max-width:170px;
+  padding:0 20px 0 4px;
+  border:0;
+  background:#3a3a3a;
+  color:#c7c7c7;
+  font-size:16px;
+  line-height:1.15;
+  font-weight:700;
+  cursor:pointer;
+}
+select:focus, textarea:focus, input:focus { outline:1px solid #aaa; outline-offset:1px; }
+button {
+  border:2px solid #bfbfbf;
+  border-radius:0;
+  background:#151515;
+  color:#f1f1f1;
+  box-shadow:inset 0 0 0 1px #000, 0 1px 0 rgba(255,255,255,.14);
+  padding:8px 14px;
+  cursor:pointer;
+  text-transform:uppercase;
+  font-size:16px;
+  font-weight:700;
+}
+button:hover { background:#222; color:#fff; }
+button.secondary {
+  color:#e4e4e4;
+  border-color:#858585;
+  background:#252525;
+  text-shadow:0 1px 1px #000;
+}
+.buttons { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; align-items:center; }
+.checkline {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  color:#bfbfbf;
+  padding:7px 8px;
+  border:1px solid #6b6b6b;
+  background:#303030;
+  font-size:14px;
+}
+.checkline input { width:auto; box-shadow:none; }
+.status {
+  min-height:28px;
+  margin-top:9px;
+  padding:6px 8px;
+  border:1px solid #151515;
+  background:#303030;
+  color:#bdbdbd;
+  font-size:15px;
+}
+.status.bad { color:var(--red2); border-color:#420000; background:#2c1f1f; }
+.status.ok { color:#d0d0d0; }
+.nav-row { display:block; margin-top:0; }
+.category-tabs {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  padding:7px 0 10px;
+  border:0;
+  border-top:1px solid #121212;
+  border-bottom:1px solid #191919;
+  background:transparent;
+}
+.tab {
+  border:1px solid #686868;
+  border-radius:0;
+  background:#242424;
+  color:#b8b8b8;
+  padding:6px 10px;
+  cursor:pointer;
+  user-select:none;
+  font-size:15px;
+  font-weight:700;
+  text-transform:uppercase;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+.tab.active {
+  color:#ffffff;
+  border-color:#d0d0d0;
+  background:#050505;
+}
+.tab .count { opacity:.62; font-size:12px; }
+.tab .changed-dot {
+  display:inline-block;
+  min-width:18px;
+  padding:0 4px;
+  margin-left:3px;
+  background:transparent;
+  color:var(--red2);
+  font-size:13px;
+  font-weight:700;
+}
+.layout { display:block; margin-top:0; }
+.sidebar { display:none; }
+.content-card {
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  padding:0;
+}
+.content-card h2 { margin:0; color:#d5d5d5; font-size:18px; }
+.search-strip {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  margin:0 0 10px;
+}
+.category-panel {
+  overflow:hidden;
+  border:0;
+  border-radius:0;
+  background:#3f3f3f;
+  margin:0 0 12px;
+  box-shadow:none;
+}
+.category-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:5px 8px;
+  color:#efefef;
+  background:#000;
+  border:0;
+  border-top:1px solid #000;
+  border-bottom:1px solid #111;
+}
+.category-head h3 {
+  margin:0;
+  font-size:18px;
+  line-height:1.1;
+  text-transform:uppercase;
+}
+.category-meta { display:flex; gap:8px; font-size:13px; color:#999; }
+.pill {
+  display:inline-flex;
+  border:0;
+  border-radius:0;
+  padding:0;
+  background:transparent;
+  color:#a8a8a8;
+}
+.settings-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0 28px;
+  padding:8px 10px 10px;
+  background:#3f3f3f;
+}
+.setting-card {
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  padding:2px 4px;
+  min-height:25px;
+}
+.setting-card.changed { border:0; background:transparent; }
+.setting-line {
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  white-space:nowrap;
+  min-width:0;
+}
+.setting-name {
+  color:#b7b7b7;
+  font-size:17px;
+  font-weight:700;
+  line-height:1.05;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.setting-sep { color:#858585; font-size:18px; }
+.setting-card.changed select { color:var(--red); }
+.setting-card.changed .setting-name { color:#b7b7b7; }
+.setting-meta-line {
+  display:none;
+  color:#8b8b8b;
+  font-family:"Lucida Console", Consolas, ui-monospace, monospace;
+  font-size:10px;
+  letter-spacing:0;
+  text-shadow:none;
+}
+/* Hover must not change row height; details stay in the browser tooltip/title instead. */
+.setting-card:hover .setting-meta-line { display:none; }
+.property, .setting-code, .default-line, .value-row, .setting-top { display:none; }
+.unknown-box {
+  border:1px solid #5e4a1e;
+  border-radius:0;
+  background:#342d1f;
+  color:#d2b45f;
+  padding:8px;
+  margin-top:10px;
+}
+.unknown-list { display:grid; gap:5px; margin-top:7px; }
+.unknown-row {
+  border:1px solid #5e4a1e;
+  border-radius:0;
+  background:#2f2a1e;
+  padding:6px;
+  font-size:13px;
+}
+.footer-note {
+  color:#a9a9a9;
+  font-family:Verdana, Tahoma, Arial, sans-serif;
+  font-size:11px;
+  line-height:1.45;
+  margin:12px 2px 0;
+  text-shadow:0 1px 1px #000;
+}
+.empty-note { padding:16px; color:#a0a0a0; text-align:center; }
+@media (min-width: 760px) {
+  .io-grid { grid-template-columns:1fr 1fr; }
+  .settings-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1040px) {
+  .settings-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  main { padding:12px; }
+  .search-strip { grid-template-columns:1fr; }
+  .setting-line { white-space:normal; }
+}
 </style>
 </head>
 <body>
 <main>
-<h1>7 Days to Die V3.0 SandboxCode Encoder / Decoder</h1>
-<p>Browser-only tool. Paste a <code>SandboxCode</code>, edit values, then copy the generated code. Unknown blocks are preserved when possible. Current package maps EHK as Book Abundance / 200%.</p>
-<div class="panel row">
-  <div>
-    <label for="inputCode">Input SandboxCode</label>
-    <textarea id="inputCode">AAAGABGACGADGARJAMJBUEBHIBOACDACVDCFBCHCCOHDAGDKKEHKFFAETA</textarea>
-    <div class="buttons">
-      <button id="decodeBtn">Decode input</button>
-      <button id="resetBtn">Reset to defaults</button>
-      <button id="sampleBtn">Load sample</button>
+  <section class="hero">
+    <div class="hero-content">
+      <div>
+        <h1>Sandbox Options</h1>
+        <p>Decode a SandboxCode, edit settings by category, then copy the generated code.</p>
+      </div>
+      <div class="badges">
+        <span class="badge">GitHub Pages ready</span>
+        <span class="badge">No build step</span>
+        <span class="badge">Category editor</span>
+        <span class="badge">EHK = Book Abundance</span>
+      </div>
     </div>
-  </div>
-  <div>
-    <label for="outputCode">Generated SandboxCode</label>
-    <textarea id="outputCode" readonly></textarea>
-    <div class="buttons">
-      <button id="copyBtn">Copy generated code</button>
-      <label class="small"><input id="keepUnknown" type="checkbox" checked style="width:auto"> keep unknown blocks</label>
+  </section>
+
+  <section class="chrome">
+    <div class="toolbar">
+      <div class="io-grid">
+        <div>
+          <div class="field-title"><label for="inputCode">Input SandboxCode</label><span class="mono">paste</span></div>
+          <textarea id="inputCode">AAAGABGACGADGARJAMJBUEBHIBOACDACVDCFBCHCCOHDAGDKKEHKFFAETA</textarea>
+          <div class="buttons">
+            <button id="decodeBtn">Decode input</button>
+            <button id="sampleBtn" class="secondary">Load sample</button>
+            <button id="resetBtn" class="secondary">Reset defaults</button>
+          </div>
+        </div>
+        <div>
+          <div class="field-title"><label for="outputCode">Generated SandboxCode</label><span class="mono">copy</span></div>
+          <textarea id="outputCode" readonly></textarea>
+          <div class="buttons">
+            <button id="copyBtn">Copy generated code</button>
+            <label class="checkline"><input id="keepUnknown" type="checkbox" checked> keep unknown blocks</label>
+          </div>
+        </div>
+      </div>
+      <div id="status" class="status"></div>
     </div>
-  </div>
-</div>
-<div id="status" class="status"></div>
-<div class="panel">
-  <input id="filter" placeholder="Filter settings by name, property, category, or code...">
-</div>
-<div class="panel">
-<table>
-  <thead><tr><th>Code</th><th>Category</th><th>Setting</th><th>Property</th><th>Value</th><th>Default</th></tr></thead>
-  <tbody id="tbody"></tbody>
-</table>
-</div>
-<p class="small">Unofficial tool. No game files or assets are included. Mapping table is derived from the public references listed in <code>references/SOURCES.md</code>.</p>
+
+    <div class="nav-row">
+      <div id="categoryTabs" class="category-tabs" aria-label="Categories"></div>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>Current code summary</h2>
+        <div class="summary-grid">
+          <div class="summary-card"><strong id="knownCount">0</strong><span>known changed blocks</span></div>
+          <div class="summary-card"><strong id="unknownCount">0</strong><span>unknown preserved blocks</span></div>
+          <div class="summary-card"><strong id="visibleCount">0</strong><span>visible settings</span></div>
+          <div class="summary-card"><strong id="categoryCount">0</strong><span>categories shown</span></div>
+        </div>
+      </aside>
+
+      <section class="content-card">
+        <div class="search-strip">
+          <input id="filter" placeholder="Filter by setting, property, category, or code...">
+          <button id="showAllBtn" class="secondary">Show all categories</button>
+        </div>
+        <div id="categories"></div>
+        <div id="unknowns"></div>
+      </section>
+    </div>
+  </section>
+
+  <p class="footer-note">Unofficial tool. No game files or assets are included. Mapping table is derived from the public references listed in <code>references/SOURCES.md</code>. Verify against your exact game build if the result is important.</p>
 </main>
 <script>
-const OPTIONS = [{"category": "Player", "name": "Ranged Damage", "property": "RangedDamage", "id": 0, "code": "AA", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 0}, {"category": "Player", "name": "Melee Damage", "property": "MeleeDamage", "id": 1, "code": "AB", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 1}, {"category": "Player", "name": "Block Damage", "property": "BlockDamage", "id": 2, "code": "AC", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 2}, {"category": "Player", "name": "Terrain Damage", "property": "TerrainDamage", "id": 3, "code": "AD", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 3}, {"category": "Player", "name": "Headshot Multiplier", "property": "HeadshotMultiplier", "id": 4, "code": "AE", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 4}, {"category": "Player", "name": "Incoming Damage", "property": "IncomingDamage", "id": 17, "code": "AR", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 5}, {"category": "Player", "name": "Walk Speed", "property": "WalkSpeed", "id": 6, "code": "AG", "type": "Float", "default": "1", "values": ["0.25", "0.5", "0.6", "0.7", "0.8", "0.9", "1", "1.1", "1.2", "1.3", "1.4", "1.5", "2", "3"], "order": 6}, {"category": "Player", "name": "Run Speed", "property": "RunSpeed", "id": 7, "code": "AH", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.6", "0.7", "0.8", "0.9", "1", "1.1", "1.2", "1.3", "1.4", "1.5", "2", "3"], "order": 7}, {"category": "Player", "name": "Crouch Speed", "property": "CrouchSpeed", "id": 5, "code": "AF", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.6", "0.7", "0.8", "0.9", "1", "1.1", "1.2", "1.3", "1.4", "1.5", "2", "3"], "order": 8}, {"category": "Player", "name": "Jump Height", "property": "JumpStrength", "id": 8, "code": "AI", "type": "Float", "default": "1", "values": ["0", "0.5", "1", "1.25", "1.5", "2", "3"], "order": 9}, {"category": "Player", "name": "Stamina Regen", "property": "StaminaRegen", "id": 10, "code": "AK", "type": "Float", "default": "1", "values": ["0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 10}, {"category": "Player", "name": "Stamina Usage", "property": "StaminaUsage", "id": 9, "code": "AJ", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2"], "order": 11}, {"category": "Player", "name": "XP Multiplier", "property": "XPMultiplier", "id": 18, "code": "AS", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "3", "5"], "order": 12}, {"category": "Player", "name": "Show XP", "property": "ShowXP", "id": 19, "code": "AT", "type": "Int", "default": "0", "values": ["0", "1", "2", "3"], "order": 13}, {"category": "Player", "name": "Level Health/Stam Bonus", "property": "PlayerLevelBonusApplied", "id": 11, "code": "AL", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 14}, {"category": "Player", "name": "Skill Gain Rate", "property": "SkillGainRate", "id": 116, "code": "EM", "type": "Int", "default": "1", "values": ["1", "2", "3", "4", "5"], "order": 15}, {"category": "Player", "name": "Skill Gain Amount", "property": "SkillPointsPerLevel", "id": 117, "code": "EN", "type": "Int", "default": "1", "values": ["0", "1", "2", "3", "4", "5", "6", "7"], "order": 16}, {"category": "Player", "name": "Death Penalty", "property": "DeathPenalty", "id": 26, "code": "BA", "type": "Int", "default": "1", "values": ["0", "1", "2", "3"], "order": 17}, {"category": "Player", "name": "Lose Items Death Type", "property": "LoseItemsOnDeathType", "id": 22, "code": "AW", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4", "5"], "order": 18}, {"category": "Player", "name": "Lose Items Death Count", "property": "LoseItemsOnDeathCount", "id": 23, "code": "AX", "type": "Int", "default": "1", "values": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], "order": 19}, {"category": "Player", "name": "Degrade Items On Death", "property": "DegradeItemsOnDeath", "id": 24, "code": "AY", "type": "Int", "default": "0", "values": ["0", "1", "2", "3"], "order": 20}, {"category": "Player", "name": "Degrade Amount On Death", "property": "DegradeAmountOnDeath", "id": 25, "code": "AZ", "type": "Float", "default": "0.1", "values": ["0", "0.05", "0.1", "0.15", "0.2", "0.25"], "order": 21}, {"category": "Player", "name": "Drop On Death", "property": "DropOnDeath", "id": 27, "code": "BB", "type": "Int", "default": "1", "values": ["0", "1", "2", "3", "4"], "order": 22}, {"category": "Player", "name": "Drop On Quit", "property": "DropOnQuit", "id": 28, "code": "BC", "type": "Int", "default": "0", "values": ["0", "1", "2", "3"], "order": 23}, {"category": "Player", "name": "Infection Rate", "property": "InfectionRate", "id": 29, "code": "BD", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 24}, {"category": "Player", "name": "Allow Newbie Coat", "property": "NewbieCoat", "id": 15, "code": "AP", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 25}, {"category": "Player", "name": "Encumbrance Modifier", "property": "EncumbranceModifier", "id": 20, "code": "AU", "type": "Float", "default": "1", "values": ["10", "1.35", "1", "0.7", "0.35", "0"], "order": 26}, {"category": "Player", "name": "Jar Refund", "property": "JarRefund", "id": 12, "code": "AM", "type": "Float", "default": "0.6", "values": ["0", "0.05", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"], "order": 27}, {"category": "Entities", "name": "Enemy Spawn", "property": "EnemySpawnMode", "id": 30, "code": "BE", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 28}, {"category": "Entities", "name": "Max Enemy Type", "property": "MaxEnemyTier", "id": 43, "code": "BR", "type": "Int", "default": "5", "values": ["0", "1", "2", "3", "4", "5"], "order": 29}, {"category": "Entities", "name": "Biome Enemy Density", "property": "BiomeEnemyDensity", "id": 46, "code": "BU", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4", "5"], "order": 30}, {"category": "Entities", "name": "Biome Enemy Respawn", "property": "BiomeZombieRespawn", "id": 44, "code": "BS", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4", "5"], "order": 31}, {"category": "Entities", "name": "Biome Animal Respawn", "property": "BiomeAnimalRespawn", "id": 45, "code": "BT", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4", "5"], "order": 32}, {"category": "Entities", "name": "Entity Damage", "property": "EntityDamage", "id": 31, "code": "BF", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 33}, {"category": "Entities", "name": "Entity Incoming Damage", "property": "EntityIncomingDamage", "id": 42, "code": "BQ", "type": "Float", "default": "1", "values": ["0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 34}, {"category": "Entities", "name": "Entity Block Damage", "property": "BlockDamageAI", "id": 32, "code": "BG", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 35}, {"category": "Entities", "name": "Blood Moon Block Damage", "property": "BlockDamageAIBM", "id": 33, "code": "BH", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 36}, {"category": "Entities", "name": "Headshot Mode", "property": "HeadshotMode", "id": 16, "code": "AQ", "type": "Int", "default": "0", "values": ["0", "1", "2"], "order": 37}, {"category": "Entities", "name": "Entity Health Bars", "property": "ShowHealthBars", "id": 13, "code": "AN", "type": "Bool", "default": "False", "values": ["False", "True"], "order": 38}, {"category": "Entities", "name": "Show Entity Damage", "property": "ShowEnemyDamage", "id": 14, "code": "AO", "type": "Bool", "default": "False", "values": ["False", "True"], "order": 39}, {"category": "Entities", "name": "Zombie Day Speed", "property": "ZombieMove", "id": 34, "code": "BI", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4"], "order": 40}, {"category": "Entities", "name": "Zombie Night Speed", "property": "ZombieMoveNight", "id": 35, "code": "BJ", "type": "Int", "default": "3", "values": ["0", "1", "2", "3", "4"], "order": 41}, {"category": "Entities", "name": "Zombie Feral Speed", "property": "ZombieFeralMove", "id": 36, "code": "BK", "type": "Int", "default": "3", "values": ["0", "1", "2", "3", "4"], "order": 42}, {"category": "Entities", "name": "Zombie Blood Moon Speed", "property": "ZombieBMMove", "id": 37, "code": "BL", "type": "Int", "default": "3", "values": ["0", "1", "2", "3", "4"], "order": 43}, {"category": "Entities", "name": "Zombie Feral Sense", "property": "ZombieFeralSense", "id": 38, "code": "BM", "type": "Int", "default": "0", "values": ["0", "1", "2", "3"], "order": 44}, {"category": "Entities", "name": "Zombie AI Smell Mode", "property": "AISmellMode", "id": 39, "code": "BN", "type": "Int", "default": "3", "values": ["0", "1", "2", "3", "4", "5"], "order": 45}, {"category": "Entities", "name": "Zombie Rage Chance", "property": "ZombieRageChance", "id": 41, "code": "BP", "type": "Float", "default": "0.15", "values": ["0", "0.15", "0.3", "0.35", "0.4", "0.5", "0.6", "0.75", "0.9", "1"], "order": 46}, {"category": "Entities", "name": "Allow Zombie Digging", "property": "AllowZombieDigging", "id": 40, "code": "BO", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 47}, {"category": "Entities", "name": "Zombies Eat Animals", "property": "ZombiesEatAnimals", "id": 47, "code": "BV", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 48}, {"category": "World", "name": "Global GameStage", "property": "GlobalGSModifier", "id": 60, "code": "CI", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 49}, {"category": "World", "name": "Biome GameStage", "property": "BiomeGSModifier", "id": 61, "code": "CJ", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 50}, {"category": "World", "name": "Biome Progression", "property": "BiomeProgression", "id": 55, "code": "CD", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 51}, {"category": "World", "name": "Temperature Survival", "property": "TemperatureSurvival", "id": 56, "code": "CE", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 52}, {"category": "World", "name": "Max Tech Type", "property": "MaxTechType", "id": 74, "code": "CW", "type": "Int", "default": "4", "values": ["0", "1", "2", "3", "4"], "order": 53}, {"category": "World", "name": "Workstations in the Wild", "property": "WorkstationsInTheWild", "id": 73, "code": "CV", "type": "Float", "default": "0", "values": ["0", "0.05", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"], "order": 54}, {"category": "World", "name": "Blood Moon Frequency", "property": "BloodMoonFrequency", "id": 48, "code": "BW", "type": "Int", "default": "7", "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "14", "20", "30"], "order": 55}, {"category": "World", "name": "Blood Moon Range", "property": "BloodMoonRange", "id": 49, "code": "BX", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4", "7", "10", "14", "20"], "order": 56}, {"category": "World", "name": "Blood Moon Count", "property": "BloodMoonEnemyCount", "id": 51, "code": "BZ", "type": "Int", "default": "8", "values": ["4", "6", "8", "10", "12", "16", "24", "32", "64"], "order": 57}, {"category": "World", "name": "Blood Moon Warning", "property": "BloodMoonWarning", "id": 50, "code": "BY", "type": "Int", "default": "1", "values": ["0", "1", "2"], "order": 58}, {"category": "World", "name": "Air Drops", "property": "AirDropFrequency", "id": 52, "code": "CA", "type": "Int", "default": "3", "values": ["0", "1", "2", "3", "4", "5", "6"], "order": 59}, {"category": "World", "name": "Air Drop Random Time", "property": "AirDropRandomTime", "id": 54, "code": "CC", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4", "5", "6"], "order": 60}, {"category": "World", "name": "Storm Frequency", "property": "StormFreq", "id": 57, "code": "CF", "type": "Float", "default": "1", "values": ["0", "0.5", "1", "1.5", "2", "3", "4", "5"], "order": 61}, {"category": "World", "name": "Storm Warning", "property": "StormWarning", "id": 58, "code": "CG", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 62}, {"category": "World", "name": "Heatmap Sensitivity", "property": "HeatMapSensitivity", "id": 59, "code": "CH", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "1", "1.5", "2"], "order": 63}, {"category": "World", "name": "24 Hour Cycle", "property": "DayNightLength", "id": 66, "code": "CO", "type": "Int", "default": "60", "values": ["10", "20", "30", "40", "50", "60", "90", "120"], "order": 64}, {"category": "World", "name": "Day Light Length", "property": "DayLightLength", "id": 67, "code": "CP", "type": "Int", "default": "18", "values": ["0", "4", "6", "8", "10", "12", "14", "16", "18", "20", "24"], "order": 65}, {"category": "World", "name": "Mark Air Drops", "property": "AirDropMarker", "id": 53, "code": "CB", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 66}, {"category": "World", "name": "Allow Map", "property": "AllowMap", "id": 68, "code": "CQ", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 67}, {"category": "World", "name": "Allow Compass", "property": "AllowCompass", "id": 69, "code": "CR", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 68}, {"category": "World", "name": "Allow Screen Markers", "property": "AllowScreenMarkers", "id": 70, "code": "CS", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 69}, {"category": "World", "name": "Show Location Info", "property": "ShowLocationInfo", "id": 71, "code": "CT", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 70}, {"category": "World", "name": "Show Day/Time", "property": "ShowDayTime", "id": 72, "code": "CU", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 71}, {"category": "Resources", "name": "Loot Max Tier", "property": "LootMaxTier", "id": 77, "code": "CZ", "type": "Int", "default": "6", "values": ["1", "2", "3", "4", "5", "6"], "order": 72}, {"category": "Resources", "name": "Global LootStage", "property": "GlobalLSModifier", "id": 62, "code": "CK", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 73}, {"category": "Resources", "name": "Biome LootStage", "property": "BiomeLSModifier", "id": 63, "code": "CL", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 74}, {"category": "Resources", "name": "POI Tier LootStage", "property": "POITierLSModifier", "id": 64, "code": "CM", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 75}, {"category": "Resources", "name": "Loot Respawn Days", "property": "LootRespawnDays", "id": 75, "code": "CX", "type": "Int", "default": "7", "values": ["-1", "5", "7", "10", "15", "20", "30", "40", "50"], "order": 76}, {"category": "Resources", "name": "Loot Time", "property": "LootTimer", "id": 76, "code": "CY", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 77}, {"category": "Resources", "name": "Loot Bag Chance", "property": "LootBagChance", "id": 90, "code": "DM", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 78}, {"category": "Resources", "name": "Global Loot Abundance", "property": "GlobalLootCount", "id": 78, "code": "DA", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 79}, {"category": "Resources", "name": "Food Abundance", "property": "FoodLootCount", "id": 79, "code": "DB", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 80}, {"category": "Resources", "name": "Drink Abundance", "property": "DrinkLootCount", "id": 80, "code": "DC", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 81}, {"category": "Resources", "name": "Medical Abundance", "property": "MedicalLootCount", "id": 81, "code": "DD", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 82}, {"category": "Resources", "name": "Ammo Abundance", "property": "AmmoLootCount", "id": 82, "code": "DE", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 83}, {"category": "Resources", "name": "Resource Abundance", "property": "ResourceLootCount", "id": 83, "code": "DF", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 84}, {"category": "Resources", "name": "Armor Abundance", "property": "ArmorLootCount", "id": 84, "code": "DG", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 85}, {"category": "Resources", "name": "Melee Abundance", "property": "MeleeLootCount", "id": 85, "code": "DH", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 86}, {"category": "Resources", "name": "Ranged Abundance", "property": "RangedLootCount", "id": 86, "code": "DI", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 87}, {"category": "Resources", "name": "Dukes Abundance", "property": "DukesLootCount", "id": 87, "code": "DJ", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 88}, {"category": "Resources", "name": "Magazines Abundance", "property": "CraftingMagazinesLootCount", "id": 88, "code": "DK", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 89}, {"category": "Resources", "name": "Book Abundance", "property": "BookLootCount", "id": 111, "code": "EH", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 90, "source_note": "Inferred: current public generators list Book Abundance / BookLootCount after Magazine Abundance; observed block EHK uses value index K, matching 200% in the shared loot abundance value list. Verify against the exact game build if needed."}, {"category": "Resources", "name": "Treasure Map Chance", "property": "TreasureMapChance", "id": 89, "code": "DL", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.6", "0.7", "0.8", "0.9", "1", "1.1", "1.2", "1.3", "1.4", "1.5", "2", "3"], "order": 91}, {"category": "Resources", "name": "Mining Output", "property": "MiningOutput", "id": 101, "code": "DX", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 92}, {"category": "Resources", "name": "Crop Output", "property": "CropOutput", "id": 91, "code": "DN", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 93}, {"category": "Resources", "name": "Seed Drop Output", "property": "SeedDropOutput", "id": 92, "code": "DO", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 94}, {"category": "Resources", "name": "Harvesting Output", "property": "HarvestingOutput", "id": 102, "code": "DY", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "3", "4", "5"], "order": 95}, {"category": "Resources", "name": "Crop Growth", "property": "CropGrowthSpeed", "id": 93, "code": "DP", "type": "Float", "default": "1", "values": ["1000", "0", "0.2", "0.5", "0.75", "1", "1.5", "2", "3"], "order": 96}, {"category": "Crafting", "name": "Crafting Progression", "property": "CraftingProgression", "id": 96, "code": "DS", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 97}, {"category": "Crafting", "name": "Crafting Max Tier", "property": "CraftingMaxTier", "id": 100, "code": "DW", "type": "Int", "default": "6", "values": ["1", "2", "3", "4", "5", "6"], "order": 98}, {"category": "Crafting", "name": "Magazine Points", "property": "PointsPerMagazine", "id": 115, "code": "EL", "type": "Int", "default": "1", "values": ["0", "1", "2", "3", "4", "5", "6", "7"], "order": 99}, {"category": "Crafting", "name": "Backpack Crafting", "property": "BackpackCrafting", "id": 94, "code": "DQ", "type": "Int", "default": "1", "values": ["0", "1", "2", "3"], "order": 100}, {"category": "Crafting", "name": "Workstation Crafting", "property": "WorkstationCrafting", "id": 95, "code": "DR", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 101}, {"category": "Crafting", "name": "Smelter Type", "property": "SmeltingType", "id": 104, "code": "EA", "type": "Bool", "default": "False", "values": ["False", "True"], "order": 102}, {"category": "Crafting", "name": "Crafting Time", "property": "CraftingTime", "id": 97, "code": "DT", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 103}, {"category": "Crafting", "name": "Crafting Input", "property": "CraftingInput", "id": 98, "code": "DU", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 104}, {"category": "Crafting", "name": "Crafting Output", "property": "CraftingOutput", "id": 99, "code": "DV", "type": "Float", "default": "1", "values": ["0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 105}, {"category": "Crafting", "name": "Scrapping Output", "property": "ScrappingOutput", "id": 103, "code": "DZ", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 106}, {"category": "Crafting", "name": "Dew Collector Time", "property": "DewCollectorTime", "id": 105, "code": "EB", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 107}, {"category": "Crafting", "name": "Dew Collector Output", "property": "DewCollectorOutput", "id": 106, "code": "EC", "type": "Float", "default": "1", "values": ["1", "2", "3", "4", "5"], "order": 108}, {"category": "Crafting", "name": "Dew Collector Input", "property": "DewCollectorInput", "id": 107, "code": "ED", "type": "Float", "default": "1", "values": ["0", "1", "2", "3"], "order": 109}, {"category": "Crafting", "name": "Apiary Time", "property": "ApiaryTime", "id": 108, "code": "EE", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 110}, {"category": "Crafting", "name": "Apiary Output", "property": "ApiaryOutput", "id": 109, "code": "EF", "type": "Float", "default": "1", "values": ["1", "2", "3", "4", "5"], "order": 111}, {"category": "Crafting", "name": "Apiary Input", "property": "ApiaryInput", "id": 110, "code": "EG", "type": "Float", "default": "1", "values": ["0", "0.2", "0.4", "0.6", "0.8", "1", "1.5", "2", "3"], "order": 112}, {"category": "Crafting", "name": "Item Degradation", "property": "ItemDegradation", "id": 21, "code": "AV", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "1", "1.5", "2"], "order": 113}, {"category": "Crafting", "name": "Item Repair Types", "property": "RepairTypes", "id": 113, "code": "EJ", "type": "Int", "default": "3", "values": ["0", "1", "2", "3"], "order": 114}, {"category": "Crafting", "name": "Max Degrade Amount", "property": "MaxDegradationAmount", "id": 114, "code": "EK", "type": "Float", "default": "0", "values": ["0", "0.05", "0.1", "0.15", "0.2", "0.25"], "order": 115}, {"category": "Traders", "name": "Trading Enabled", "property": "TradersEnabled", "id": 128, "code": "EY", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 116}, {"category": "Traders", "name": "Vending Machines Enabled", "property": "VendingEnabled", "id": 129, "code": "EZ", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 117}, {"category": "Traders", "name": "Trader Hours", "property": "TraderHours", "id": 127, "code": "EX", "type": "Int", "default": "0", "values": ["0", "1", "2", "3", "4", "5", "6"], "order": 118}, {"category": "Traders", "name": "Trader Protection", "property": "TraderProtection", "id": 132, "code": "FC", "type": "Int", "default": "0", "values": ["0", "1", "2"], "order": 119}, {"category": "Traders", "name": "Trading Dialog", "property": "TraderDialog", "id": 126, "code": "EW", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 120}, {"category": "Traders", "name": "Global TraderStage", "property": "GlobalTSModifier", "id": 65, "code": "CN", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 121}, {"category": "Traders", "name": "Trader Max Tier", "property": "TraderMaxTier", "id": 136, "code": "FG", "type": "Int", "default": "6", "values": ["1", "2", "3", "4", "5", "6"], "order": 122}, {"category": "Traders", "name": "Trader Item Abundance", "property": "TraderItemAbundance", "id": 134, "code": "FE", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 123}, {"category": "Traders", "name": "Vending Item Abundance", "property": "VendingItemAbundance", "id": 138, "code": "FI", "type": "Float", "default": "1", "values": ["0.25", "0.5", "1", "1.5", "2"], "order": 124}, {"category": "Traders", "name": "Trader Reset Interval", "property": "TraderResetInterval", "id": 133, "code": "FD", "type": "Int", "default": "-1", "values": ["-1", "1", "2", "3", "4", "5", "6", "7", "14"], "order": 125}, {"category": "Traders", "name": "Vending Reset Interval", "property": "VendingResetInterval", "id": 137, "code": "FH", "type": "Int", "default": "-1", "values": ["-1", "1", "2", "3", "4", "5", "6", "7", "14"], "order": 126}, {"category": "Traders", "name": "Traders Sell Price", "property": "TraderSellPrices", "id": 130, "code": "FA", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "3", "4"], "order": 127}, {"category": "Traders", "name": "Traders Buy Price", "property": "TraderBuyPrices", "id": 131, "code": "FB", "type": "Float", "default": "1", "values": ["0", "0.25", "0.5", "0.75", "1", "1.25", "1.5", "1.75", "2", "3", "4"], "order": 128}, {"category": "Traders", "name": "Trader Buy Limit", "property": "TraderBuyLimit", "id": 135, "code": "FF", "type": "Int", "default": "3", "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], "order": 129}, {"category": "Tasks", "name": "Challenges Enabled", "property": "ChallengesEnabled", "id": 139, "code": "FJ", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 130}, {"category": "Tasks", "name": "Quests Enabled", "property": "QuestsEnabled", "id": 118, "code": "EO", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 131}, {"category": "Tasks", "name": "Intro Challenges Enabled", "property": "IntroChallengesEnabled", "id": 140, "code": "FK", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 132}, {"category": "Tasks", "name": "Intro Quest Enabled", "property": "IntroQuestEnabled", "id": 119, "code": "EP", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 133}, {"category": "Tasks", "name": "Trader to Trader Quests", "property": "TraderToTraderQuestsEnabled", "id": 120, "code": "EQ", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 134}, {"category": "Tasks", "name": "Buried Quests Enabled", "property": "BuriedQuestsEnabled", "id": 124, "code": "EU", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 135}, {"category": "Tasks", "name": "POI Quests Enabled", "property": "POIQuestsEnabled", "id": 125, "code": "EV", "type": "Bool", "default": "True", "values": ["False", "True"], "order": 136}, {"category": "Tasks", "name": "Quests per Tier", "property": "QuestsPerTier", "id": 122, "code": "ES", "type": "Int", "default": "10", "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"], "order": 137}, {"category": "Tasks", "name": "Quests per Day", "property": "QuestProgressionDailyLimit", "id": 123, "code": "ET", "type": "Int", "default": "4", "values": ["-1", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], "order": 138}, {"category": "Tasks", "name": "Starter Skill Points", "property": "StarterSkillPoints", "id": 121, "code": "ER", "type": "Int", "default": "4", "values": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], "order": 139}, {"category": "Misc", "name": "Vehicle Fuel Usage", "property": "VehicleFuelUsage", "id": 141, "code": "FL", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 140}, {"category": "Misc", "name": "Vehicle Entity Damage", "property": "VehicleEntityDamage", "id": 142, "code": "FM", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 141}, {"category": "Misc", "name": "Vehicle Block Damage", "property": "VehicleBlockDamage", "id": 143, "code": "FN", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 142}, {"category": "Misc", "name": "Vehicle Self Damage", "property": "VehicleSelfDamage", "id": 144, "code": "FO", "type": "Float", "default": "1", "values": ["0", "0.25", "0.35", "0.5", "0.65", "0.75", "0.85", "1", "1.25", "1.5", "2", "2.5", "3"], "order": 143}, {"category": "Misc", "name": "Electrical Output", "property": "ElectricalOutput", "id": 145, "code": "FP", "type": "Float", "default": "1", "values": ["0.25", "0.5", "0.75", "1", "1.25", "1.5", "2", "3"], "order": 144}, {"category": "Misc", "name": "Celebrate Kills", "property": "SillyCelebrate", "id": 146, "code": "FQ", "type": "Int", "default": "0", "values": ["0", "1", "2"], "order": 145}, {"category": "Misc", "name": "Big Heads", "property": "SillyBigHeads", "id": 147, "code": "FR", "type": "Bool", "default": "False", "values": ["False", "True"], "order": 146}, {"category": "Misc", "name": "Tiny Zombies", "property": "SillyTinyZombies", "id": 148, "code": "FS", "type": "Bool", "default": "False", "values": ["False", "True"], "order": 147}, {"category": "Misc", "name": "Gravity", "property": "SillyLowGravity", "id": 150, "code": "FU", "type": "Float", "default": "1", "values": ["0.5", "0.6", "0.7", "0.8", "0.9", "1"], "order": 148}, {"category": "Misc", "name": "Silly Sounds", "property": "SillySounds", "id": 149, "code": "FT", "type": "Bool", "default": "False", "values": ["False", "True"], "order": 149}, {"category": "Misc", "name": "Black and White", "property": "SillyBlackandWhite", "id": 151, "code": "FV", "type": "Bool", "default": "False", "values": ["False", "True"], "order": 150}];
+const OPTIONS = [{"category":"Player","name":"Ranged Damage","property":"RangedDamage","id":0,"code":"AA","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":0},{"category":"Player","name":"Melee Damage","property":"MeleeDamage","id":1,"code":"AB","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":1},{"category":"Player","name":"Block Damage","property":"BlockDamage","id":2,"code":"AC","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":2},{"category":"Player","name":"Terrain Damage","property":"TerrainDamage","id":3,"code":"AD","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":3},{"category":"Player","name":"Headshot Multiplier","property":"HeadshotMultiplier","id":4,"code":"AE","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":4},{"category":"Player","name":"Incoming Damage","property":"IncomingDamage","id":17,"code":"AR","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":5},{"category":"Player","name":"Walk Speed","property":"WalkSpeed","id":6,"code":"AG","type":"Float","default":"1","values":["0.25","0.5","0.6","0.7","0.8","0.9","1","1.1","1.2","1.3","1.4","1.5","2","3"],"order":6},{"category":"Player","name":"Run Speed","property":"RunSpeed","id":7,"code":"AH","type":"Float","default":"1","values":["0","0.25","0.5","0.6","0.7","0.8","0.9","1","1.1","1.2","1.3","1.4","1.5","2","3"],"order":7},{"category":"Player","name":"Crouch Speed","property":"CrouchSpeed","id":5,"code":"AF","type":"Float","default":"1","values":["0","0.25","0.5","0.6","0.7","0.8","0.9","1","1.1","1.2","1.3","1.4","1.5","2","3"],"order":8},{"category":"Player","name":"Jump Height","property":"JumpStrength","id":8,"code":"AI","type":"Float","default":"1","values":["0","0.5","1","1.25","1.5","2","3"],"order":9},{"category":"Player","name":"Stamina Regen","property":"StaminaRegen","id":10,"code":"AK","type":"Float","default":"1","values":["0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":10},{"category":"Player","name":"Stamina Usage","property":"StaminaUsage","id":9,"code":"AJ","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","1.75","2"],"order":11},{"category":"Player","name":"XP Multiplier","property":"XPMultiplier","id":18,"code":"AS","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","1.75","2","3","5"],"order":12},{"category":"Player","name":"Show XP","property":"ShowXP","id":19,"code":"AT","type":"Int","default":"0","values":["0","1","2","3"],"order":13},{"category":"Player","name":"Level Health/Stam Bonus","property":"PlayerLevelBonusApplied","id":11,"code":"AL","type":"Bool","default":"True","values":["False","True"],"order":14},{"category":"Player","name":"Skill Gain Rate","property":"SkillGainRate","id":116,"code":"EM","type":"Int","default":"1","values":["1","2","3","4","5"],"order":15},{"category":"Player","name":"Skill Gain Amount","property":"SkillPointsPerLevel","id":117,"code":"EN","type":"Int","default":"1","values":["0","1","2","3","4","5","6","7"],"order":16},{"category":"Player","name":"Death Penalty","property":"DeathPenalty","id":26,"code":"BA","type":"Int","default":"1","values":["0","1","2","3"],"order":17},{"category":"Player","name":"Lose Items Death Type","property":"LoseItemsOnDeathType","id":22,"code":"AW","type":"Int","default":"0","values":["0","1","2","3","4","5"],"order":18},{"category":"Player","name":"Lose Items Death Count","property":"LoseItemsOnDeathCount","id":23,"code":"AX","type":"Int","default":"1","values":["1","2","3","4","5","6","7","8","9","10"],"order":19},{"category":"Player","name":"Degrade Items On Death","property":"DegradeItemsOnDeath","id":24,"code":"AY","type":"Int","default":"0","values":["0","1","2","3"],"order":20},{"category":"Player","name":"Degrade Amount On Death","property":"DegradeAmountOnDeath","id":25,"code":"AZ","type":"Float","default":"0.1","values":["0","0.05","0.1","0.15","0.2","0.25"],"order":21},{"category":"Player","name":"Drop On Death","property":"DropOnDeath","id":27,"code":"BB","type":"Int","default":"1","values":["0","1","2","3","4"],"order":22},{"category":"Player","name":"Drop On Quit","property":"DropOnQuit","id":28,"code":"BC","type":"Int","default":"0","values":["0","1","2","3"],"order":23},{"category":"Player","name":"Infection Rate","property":"InfectionRate","id":29,"code":"BD","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":24},{"category":"Player","name":"Allow Newbie Coat","property":"NewbieCoat","id":15,"code":"AP","type":"Bool","default":"True","values":["False","True"],"order":25},{"category":"Player","name":"Encumbrance Modifier","property":"EncumbranceModifier","id":20,"code":"AU","type":"Float","default":"1","values":["10","1.35","1","0.7","0.35","0"],"order":26},{"category":"Player","name":"Jar Refund","property":"JarRefund","id":12,"code":"AM","type":"Float","default":"0.6","values":["0","0.05","0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1"],"order":27},{"category":"Entities","name":"Enemy Spawn","property":"EnemySpawnMode","id":30,"code":"BE","type":"Bool","default":"True","values":["False","True"],"order":28},{"category":"Entities","name":"Max Enemy Type","property":"MaxEnemyTier","id":43,"code":"BR","type":"Int","default":"5","values":["0","1","2","3","4","5"],"order":29},{"category":"Entities","name":"Biome Enemy Density","property":"BiomeEnemyDensity","id":46,"code":"BU","type":"Int","default":"0","values":["0","1","2","3","4","5"],"order":30},{"category":"Entities","name":"Biome Enemy Respawn","property":"BiomeZombieRespawn","id":44,"code":"BS","type":"Int","default":"0","values":["0","1","2","3","4","5"],"order":31},{"category":"Entities","name":"Biome Animal Respawn","property":"BiomeAnimalRespawn","id":45,"code":"BT","type":"Int","default":"0","values":["0","1","2","3","4","5"],"order":32},{"category":"Entities","name":"Entity Damage","property":"EntityDamage","id":31,"code":"BF","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":33},{"category":"Entities","name":"Entity Incoming Damage","property":"EntityIncomingDamage","id":42,"code":"BQ","type":"Float","default":"1","values":["0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":34},{"category":"Entities","name":"Entity Block Damage","property":"BlockDamageAI","id":32,"code":"BG","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":35},{"category":"Entities","name":"Blood Moon Block Damage","property":"BlockDamageAIBM","id":33,"code":"BH","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":36},{"category":"Entities","name":"Headshot Mode","property":"HeadshotMode","id":16,"code":"AQ","type":"Int","default":"0","values":["0","1","2"],"order":37},{"category":"Entities","name":"Entity Health Bars","property":"ShowHealthBars","id":13,"code":"AN","type":"Bool","default":"False","values":["False","True"],"order":38},{"category":"Entities","name":"Show Entity Damage","property":"ShowEnemyDamage","id":14,"code":"AO","type":"Bool","default":"False","values":["False","True"],"order":39},{"category":"Entities","name":"Zombie Day Speed","property":"ZombieMove","id":34,"code":"BI","type":"Int","default":"0","values":["0","1","2","3","4"],"order":40},{"category":"Entities","name":"Zombie Night Speed","property":"ZombieMoveNight","id":35,"code":"BJ","type":"Int","default":"3","values":["0","1","2","3","4"],"order":41},{"category":"Entities","name":"Zombie Feral Speed","property":"ZombieFeralMove","id":36,"code":"BK","type":"Int","default":"3","values":["0","1","2","3","4"],"order":42},{"category":"Entities","name":"Zombie Blood Moon Speed","property":"ZombieBMMove","id":37,"code":"BL","type":"Int","default":"3","values":["0","1","2","3","4"],"order":43},{"category":"Entities","name":"Zombie Feral Sense","property":"ZombieFeralSense","id":38,"code":"BM","type":"Int","default":"0","values":["0","1","2","3"],"order":44},{"category":"Entities","name":"Zombie AI Smell Mode","property":"AISmellMode","id":39,"code":"BN","type":"Int","default":"3","values":["0","1","2","3","4","5"],"order":45},{"category":"Entities","name":"Zombie Rage Chance","property":"ZombieRageChance","id":41,"code":"BP","type":"Float","default":"0.15","values":["0","0.15","0.3","0.35","0.4","0.5","0.6","0.75","0.9","1"],"order":46},{"category":"Entities","name":"Allow Zombie Digging","property":"AllowZombieDigging","id":40,"code":"BO","type":"Bool","default":"True","values":["False","True"],"order":47},{"category":"Entities","name":"Zombies Eat Animals","property":"ZombiesEatAnimals","id":47,"code":"BV","type":"Bool","default":"True","values":["False","True"],"order":48},{"category":"World","name":"Global GameStage","property":"GlobalGSModifier","id":60,"code":"CI","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":49},{"category":"World","name":"Biome GameStage","property":"BiomeGSModifier","id":61,"code":"CJ","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":50},{"category":"World","name":"Biome Progression","property":"BiomeProgression","id":55,"code":"CD","type":"Bool","default":"True","values":["False","True"],"order":51},{"category":"World","name":"Temperature Survival","property":"TemperatureSurvival","id":56,"code":"CE","type":"Bool","default":"True","values":["False","True"],"order":52},{"category":"World","name":"Max Tech Type","property":"MaxTechType","id":74,"code":"CW","type":"Int","default":"4","values":["0","1","2","3","4"],"order":53},{"category":"World","name":"Workstations in the Wild","property":"WorkstationsInTheWild","id":73,"code":"CV","type":"Float","default":"0","values":["0","0.05","0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1"],"order":54},{"category":"World","name":"Blood Moon Frequency","property":"BloodMoonFrequency","id":48,"code":"BW","type":"Int","default":"7","values":["0","1","2","3","4","5","6","7","8","9","10","14","20","30"],"order":55},{"category":"World","name":"Blood Moon Range","property":"BloodMoonRange","id":49,"code":"BX","type":"Int","default":"0","values":["0","1","2","3","4","7","10","14","20"],"order":56},{"category":"World","name":"Blood Moon Count","property":"BloodMoonEnemyCount","id":51,"code":"BZ","type":"Int","default":"8","values":["4","6","8","10","12","16","24","32","64"],"order":57},{"category":"World","name":"Blood Moon Warning","property":"BloodMoonWarning","id":50,"code":"BY","type":"Int","default":"1","values":["0","1","2"],"order":58},{"category":"World","name":"Air Drops","property":"AirDropFrequency","id":52,"code":"CA","type":"Int","default":"3","values":["0","1","2","3","4","5","6"],"order":59},{"category":"World","name":"Air Drop Random Time","property":"AirDropRandomTime","id":54,"code":"CC","type":"Int","default":"0","values":["0","1","2","3","4","5","6"],"order":60},{"category":"World","name":"Storm Frequency","property":"StormFreq","id":57,"code":"CF","type":"Float","default":"1","values":["0","0.5","1","1.5","2","3","4","5"],"order":61},{"category":"World","name":"Storm Warning","property":"StormWarning","id":58,"code":"CG","type":"Bool","default":"True","values":["False","True"],"order":62},{"category":"World","name":"Heatmap Sensitivity","property":"HeatMapSensitivity","id":59,"code":"CH","type":"Float","default":"1","values":["0","0.25","0.5","1","1.5","2"],"order":63},{"category":"World","name":"24 Hour Cycle","property":"DayNightLength","id":66,"code":"CO","type":"Int","default":"60","values":["10","20","30","40","50","60","90","120"],"order":64},{"category":"World","name":"Day Light Length","property":"DayLightLength","id":67,"code":"CP","type":"Int","default":"18","values":["0","4","6","8","10","12","14","16","18","20","24"],"order":65},{"category":"World","name":"Mark Air Drops","property":"AirDropMarker","id":53,"code":"CB","type":"Bool","default":"True","values":["False","True"],"order":66},{"category":"World","name":"Allow Map","property":"AllowMap","id":68,"code":"CQ","type":"Bool","default":"True","values":["False","True"],"order":67},{"category":"World","name":"Allow Compass","property":"AllowCompass","id":69,"code":"CR","type":"Bool","default":"True","values":["False","True"],"order":68},{"category":"World","name":"Allow Screen Markers","property":"AllowScreenMarkers","id":70,"code":"CS","type":"Bool","default":"True","values":["False","True"],"order":69},{"category":"World","name":"Show Location Info","property":"ShowLocationInfo","id":71,"code":"CT","type":"Bool","default":"True","values":["False","True"],"order":70},{"category":"World","name":"Show Day/Time","property":"ShowDayTime","id":72,"code":"CU","type":"Bool","default":"True","values":["False","True"],"order":71},{"category":"Resources","name":"Loot Max Tier","property":"LootMaxTier","id":77,"code":"CZ","type":"Int","default":"6","values":["1","2","3","4","5","6"],"order":72},{"category":"Resources","name":"Global LootStage","property":"GlobalLSModifier","id":62,"code":"CK","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":73},{"category":"Resources","name":"Biome LootStage","property":"BiomeLSModifier","id":63,"code":"CL","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":74},{"category":"Resources","name":"POI Tier LootStage","property":"POITierLSModifier","id":64,"code":"CM","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":75},{"category":"Resources","name":"Loot Respawn Days","property":"LootRespawnDays","id":75,"code":"CX","type":"Int","default":"7","values":["-1","5","7","10","15","20","30","40","50"],"order":76},{"category":"Resources","name":"Loot Time","property":"LootTimer","id":76,"code":"CY","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":77},{"category":"Resources","name":"Loot Bag Chance","property":"LootBagChance","id":90,"code":"DM","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":78},{"category":"Resources","name":"Global Loot Abundance","property":"GlobalLootCount","id":78,"code":"DA","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":79},{"category":"Resources","name":"Food Abundance","property":"FoodLootCount","id":79,"code":"DB","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":80},{"category":"Resources","name":"Drink Abundance","property":"DrinkLootCount","id":80,"code":"DC","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":81},{"category":"Resources","name":"Medical Abundance","property":"MedicalLootCount","id":81,"code":"DD","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":82},{"category":"Resources","name":"Ammo Abundance","property":"AmmoLootCount","id":82,"code":"DE","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":83},{"category":"Resources","name":"Resource Abundance","property":"ResourceLootCount","id":83,"code":"DF","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":84},{"category":"Resources","name":"Armor Abundance","property":"ArmorLootCount","id":84,"code":"DG","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":85},{"category":"Resources","name":"Melee Abundance","property":"MeleeLootCount","id":85,"code":"DH","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":86},{"category":"Resources","name":"Ranged Abundance","property":"RangedLootCount","id":86,"code":"DI","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":87},{"category":"Resources","name":"Dukes Abundance","property":"DukesLootCount","id":87,"code":"DJ","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":88},{"category":"Resources","name":"Magazines Abundance","property":"CraftingMagazinesLootCount","id":88,"code":"DK","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":89},{"category":"Resources","name":"Book Abundance","property":"BookLootCount","id":111,"code":"EH","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":90,"source_note":"Inferred: current public generators list Book Abundance / BookLootCount after Magazine Abundance; observed block EHK uses value index K, matching 200% in the shared loot abundance value list. Verify against the exact game build if needed."},{"category":"Resources","name":"Treasure Map Chance","property":"TreasureMapChance","id":89,"code":"DL","type":"Float","default":"1","values":["0","0.25","0.5","0.6","0.7","0.8","0.9","1","1.1","1.2","1.3","1.4","1.5","2","3"],"order":91},{"category":"Resources","name":"Mining Output","property":"MiningOutput","id":101,"code":"DX","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":92},{"category":"Resources","name":"Crop Output","property":"CropOutput","id":91,"code":"DN","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":93},{"category":"Resources","name":"Seed Drop Output","property":"SeedDropOutput","id":92,"code":"DO","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":94},{"category":"Resources","name":"Harvesting Output","property":"HarvestingOutput","id":102,"code":"DY","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","3","4","5"],"order":95},{"category":"Resources","name":"Crop Growth","property":"CropGrowthSpeed","id":93,"code":"DP","type":"Float","default":"1","values":["1000","0","0.2","0.5","0.75","1","1.5","2","3"],"order":96},{"category":"Crafting","name":"Crafting Progression","property":"CraftingProgression","id":96,"code":"DS","type":"Bool","default":"True","values":["False","True"],"order":97},{"category":"Crafting","name":"Crafting Max Tier","property":"CraftingMaxTier","id":100,"code":"DW","type":"Int","default":"6","values":["1","2","3","4","5","6"],"order":98},{"category":"Crafting","name":"Magazine Points","property":"PointsPerMagazine","id":115,"code":"EL","type":"Int","default":"1","values":["0","1","2","3","4","5","6","7"],"order":99},{"category":"Crafting","name":"Backpack Crafting","property":"BackpackCrafting","id":94,"code":"DQ","type":"Int","default":"1","values":["0","1","2","3"],"order":100},{"category":"Crafting","name":"Workstation Crafting","property":"WorkstationCrafting","id":95,"code":"DR","type":"Bool","default":"True","values":["False","True"],"order":101},{"category":"Crafting","name":"Smelter Type","property":"SmeltingType","id":104,"code":"EA","type":"Bool","default":"False","values":["False","True"],"order":102},{"category":"Crafting","name":"Crafting Time","property":"CraftingTime","id":97,"code":"DT","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":103},{"category":"Crafting","name":"Crafting Input","property":"CraftingInput","id":98,"code":"DU","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":104},{"category":"Crafting","name":"Crafting Output","property":"CraftingOutput","id":99,"code":"DV","type":"Float","default":"1","values":["0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":105},{"category":"Crafting","name":"Scrapping Output","property":"ScrappingOutput","id":103,"code":"DZ","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":106},{"category":"Crafting","name":"Dew Collector Time","property":"DewCollectorTime","id":105,"code":"EB","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":107},{"category":"Crafting","name":"Dew Collector Output","property":"DewCollectorOutput","id":106,"code":"EC","type":"Float","default":"1","values":["1","2","3","4","5"],"order":108},{"category":"Crafting","name":"Dew Collector Input","property":"DewCollectorInput","id":107,"code":"ED","type":"Float","default":"1","values":["0","1","2","3"],"order":109},{"category":"Crafting","name":"Apiary Time","property":"ApiaryTime","id":108,"code":"EE","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":110},{"category":"Crafting","name":"Apiary Output","property":"ApiaryOutput","id":109,"code":"EF","type":"Float","default":"1","values":["1","2","3","4","5"],"order":111},{"category":"Crafting","name":"Apiary Input","property":"ApiaryInput","id":110,"code":"EG","type":"Float","default":"1","values":["0","0.2","0.4","0.6","0.8","1","1.5","2","3"],"order":112},{"category":"Crafting","name":"Item Degradation","property":"ItemDegradation","id":21,"code":"AV","type":"Float","default":"1","values":["0","0.25","0.5","1","1.5","2"],"order":113},{"category":"Crafting","name":"Item Repair Types","property":"RepairTypes","id":113,"code":"EJ","type":"Int","default":"3","values":["0","1","2","3"],"order":114},{"category":"Crafting","name":"Max Degrade Amount","property":"MaxDegradationAmount","id":114,"code":"EK","type":"Float","default":"0","values":["0","0.05","0.1","0.15","0.2","0.25"],"order":115},{"category":"Traders","name":"Trading Enabled","property":"TradersEnabled","id":128,"code":"EY","type":"Bool","default":"True","values":["False","True"],"order":116},{"category":"Traders","name":"Vending Machines Enabled","property":"VendingEnabled","id":129,"code":"EZ","type":"Bool","default":"True","values":["False","True"],"order":117},{"category":"Traders","name":"Trader Hours","property":"TraderHours","id":127,"code":"EX","type":"Int","default":"0","values":["0","1","2","3","4","5","6"],"order":118},{"category":"Traders","name":"Trader Protection","property":"TraderProtection","id":132,"code":"FC","type":"Int","default":"0","values":["0","1","2"],"order":119},{"category":"Traders","name":"Trading Dialog","property":"TraderDialog","id":126,"code":"EW","type":"Bool","default":"True","values":["False","True"],"order":120},{"category":"Traders","name":"Global TraderStage","property":"GlobalTSModifier","id":65,"code":"CN","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":121},{"category":"Traders","name":"Trader Max Tier","property":"TraderMaxTier","id":136,"code":"FG","type":"Int","default":"6","values":["1","2","3","4","5","6"],"order":122},{"category":"Traders","name":"Trader Item Abundance","property":"TraderItemAbundance","id":134,"code":"FE","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":123},{"category":"Traders","name":"Vending Item Abundance","property":"VendingItemAbundance","id":138,"code":"FI","type":"Float","default":"1","values":["0.25","0.5","1","1.5","2"],"order":124},{"category":"Traders","name":"Trader Reset Interval","property":"TraderResetInterval","id":133,"code":"FD","type":"Int","default":"-1","values":["-1","1","2","3","4","5","6","7","14"],"order":125},{"category":"Traders","name":"Vending Reset Interval","property":"VendingResetInterval","id":137,"code":"FH","type":"Int","default":"-1","values":["-1","1","2","3","4","5","6","7","14"],"order":126},{"category":"Traders","name":"Traders Sell Price","property":"TraderSellPrices","id":130,"code":"FA","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","1.75","2","3","4"],"order":127},{"category":"Traders","name":"Traders Buy Price","property":"TraderBuyPrices","id":131,"code":"FB","type":"Float","default":"1","values":["0","0.25","0.5","0.75","1","1.25","1.5","1.75","2","3","4"],"order":128},{"category":"Traders","name":"Trader Buy Limit","property":"TraderBuyLimit","id":135,"code":"FF","type":"Int","default":"3","values":["0","1","2","3","4","5","6","7","8","9","10"],"order":129},{"category":"Tasks","name":"Challenges Enabled","property":"ChallengesEnabled","id":139,"code":"FJ","type":"Bool","default":"True","values":["False","True"],"order":130},{"category":"Tasks","name":"Quests Enabled","property":"QuestsEnabled","id":118,"code":"EO","type":"Bool","default":"True","values":["False","True"],"order":131},{"category":"Tasks","name":"Intro Challenges Enabled","property":"IntroChallengesEnabled","id":140,"code":"FK","type":"Bool","default":"True","values":["False","True"],"order":132},{"category":"Tasks","name":"Intro Quest Enabled","property":"IntroQuestEnabled","id":119,"code":"EP","type":"Bool","default":"True","values":["False","True"],"order":133},{"category":"Tasks","name":"Trader to Trader Quests","property":"TraderToTraderQuestsEnabled","id":120,"code":"EQ","type":"Bool","default":"True","values":["False","True"],"order":134},{"category":"Tasks","name":"Buried Quests Enabled","property":"BuriedQuestsEnabled","id":124,"code":"EU","type":"Bool","default":"True","values":["False","True"],"order":135},{"category":"Tasks","name":"POI Quests Enabled","property":"POIQuestsEnabled","id":125,"code":"EV","type":"Bool","default":"True","values":["False","True"],"order":136},{"category":"Tasks","name":"Quests per Tier","property":"QuestsPerTier","id":122,"code":"ES","type":"Int","default":"10","values":["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"],"order":137},{"category":"Tasks","name":"Quests per Day","property":"QuestProgressionDailyLimit","id":123,"code":"ET","type":"Int","default":"4","values":["-1","1","2","3","4","5","6","7","8","9","10"],"order":138},{"category":"Tasks","name":"Starter Skill Points","property":"StarterSkillPoints","id":121,"code":"ER","type":"Int","default":"4","values":["0","1","2","3","4","5","6","7","8","9","10"],"order":139},{"category":"Misc","name":"Vehicle Fuel Usage","property":"VehicleFuelUsage","id":141,"code":"FL","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":140},{"category":"Misc","name":"Vehicle Entity Damage","property":"VehicleEntityDamage","id":142,"code":"FM","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":141},{"category":"Misc","name":"Vehicle Block Damage","property":"VehicleBlockDamage","id":143,"code":"FN","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":142},{"category":"Misc","name":"Vehicle Self Damage","property":"VehicleSelfDamage","id":144,"code":"FO","type":"Float","default":"1","values":["0","0.25","0.35","0.5","0.65","0.75","0.85","1","1.25","1.5","2","2.5","3"],"order":143},{"category":"Misc","name":"Electrical Output","property":"ElectricalOutput","id":145,"code":"FP","type":"Float","default":"1","values":["0.25","0.5","0.75","1","1.25","1.5","2","3"],"order":144},{"category":"Misc","name":"Celebrate Kills","property":"SillyCelebrate","id":146,"code":"FQ","type":"Int","default":"0","values":["0","1","2"],"order":145},{"category":"Misc","name":"Big Heads","property":"SillyBigHeads","id":147,"code":"FR","type":"Bool","default":"False","values":["False","True"],"order":146},{"category":"Misc","name":"Tiny Zombies","property":"SillyTinyZombies","id":148,"code":"FS","type":"Bool","default":"False","values":["False","True"],"order":147},{"category":"Misc","name":"Gravity","property":"SillyLowGravity","id":150,"code":"FU","type":"Float","default":"1","values":["0.5","0.6","0.7","0.8","0.9","1"],"order":148},{"category":"Misc","name":"Silly Sounds","property":"SillySounds","id":149,"code":"FT","type":"Bool","default":"False","values":["False","True"],"order":149},{"category":"Misc","name":"Black and White","property":"SillyBlackandWhite","id":151,"code":"FV","type":"Bool","default":"False","values":["False","True"],"order":150}];
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const SAMPLE_CODE = 'AAAGABGACGADGARJAMJBUEBHIBOACDACVDCFBCHCCOHDAGDKKEHKFFAETA';
 const current = new Map();
 let unknownBlocks = [];
+let activeCategory = 'All';
+
+const CATEGORIES = Array.from(new Set(OPTIONS.map(o => o.category)));
+const OPTION_BY_ID = new Map(OPTIONS.map(o => [o.id, o]));
+const OPTION_BY_CODE = new Map(OPTIONS.map(o => [o.code, o]));
 
 function codeToId(pair) { return (pair.charCodeAt(0)-65)*26 + (pair.charCodeAt(1)-65); }
 function valueIndexToCode(i) { return LETTERS[i]; }
 function cleanCode(s) { return (s || '').replace(/\s+/g, '').toUpperCase() || 'A'; }
-function optionById(id) { return OPTIONS.find(o => o.id === id); }
-function setStatus(text, bad=false) { const el=document.getElementById('status'); el.textContent=text; el.className = bad ? 'status bad' : 'status'; }
-function resetDefaults() { current.clear(); for (const o of OPTIONS) current.set(o.code, o.default); unknownBlocks = []; renderTable(); encodeCurrent(); }
+function setStatus(text, bad=false) {
+  const el = document.getElementById('status');
+  el.textContent = text;
+  el.className = bad ? 'status bad' : 'status ok';
+}
+function isChanged(o) { return (current.get(o.code) ?? o.default) !== o.default; }
+function optionMatchesFilter(o, filter) {
+  if (!filter) return true;
+  return `${o.code} ${o.category} ${o.name} ${o.property} ${o.type}`.toLowerCase().includes(filter);
+}
+function resetDefaultsOnly() {
+  current.clear();
+  for (const o of OPTIONS) current.set(o.code, o.default);
+  unknownBlocks = [];
+}
+function resetDefaults() {
+  resetDefaultsOnly();
+  renderAll();
+  encodeCurrent();
+}
 
 function decodeInput() {
   try {
@@ -85,8 +469,7 @@ function decodeInput() {
     if (!/^[A-Z]+$/.test(code)) throw new Error('Only A-Z letters are valid.');
     const body = code.slice(1);
     if (body.length % 3 !== 0) throw new Error('Code body length must be divisible by 3 after the version header.');
-    current.clear(); for (const o of OPTIONS) current.set(o.code, o.default);
-    unknownBlocks = [];
+    resetDefaultsOnly();
     let knownCount = 0;
     for (let i=0; i<body.length; i+=3) {
       const block = body.slice(i, i+3);
@@ -94,14 +477,20 @@ function decodeInput() {
       const valCode = block[2];
       const id = codeToId(pair);
       const valIndex = LETTERS.indexOf(valCode);
-      const o = optionById(id);
-      if (!o || valIndex < 0 || valIndex >= o.values.length) { unknownBlocks.push({block, id, pair, valCode, order:i}); continue; }
+      const o = OPTION_BY_ID.get(id);
+      if (!o || valIndex < 0 || valIndex >= o.values.length) {
+        unknownBlocks.push({block, id, pair, valCode, order:i});
+        continue;
+      }
       current.set(o.code, o.values[valIndex]);
       knownCount++;
     }
-    renderTable(); encodeCurrent();
+    renderAll();
+    encodeCurrent();
     setStatus(`Decoded ${knownCount} known block(s), ${unknownBlocks.length} unknown block(s).`);
-  } catch (err) { setStatus(err.message, true); }
+  } catch (err) {
+    setStatus(err.message, true);
+  }
 }
 
 function encodeCurrent() {
@@ -116,49 +505,196 @@ function encodeCurrent() {
   }
   if (keepUnknown) {
     for (const u of unknownBlocks) {
-      let insert = OPTIONS.find(o => o.id > u.id);
-      let sort = insert ? insert.order * 10 - 1 : 999999 + u.order;
+      const insert = OPTIONS.find(o => o.id > u.id);
+      const sort = insert ? insert.order * 10 - 1 : 999999 + u.order;
       blocks.push({sort, block:u.block});
     }
   }
   blocks.sort((a,b) => a.sort - b.sort);
   document.getElementById('outputCode').value = 'A' + blocks.map(x => x.block).join('');
+  updateSummary();
 }
 
-function renderTable() {
-  const filter = (document.getElementById('filter').value || '').toLowerCase();
-  const body = document.getElementById('tbody');
-  body.innerHTML = '';
-  for (const o of OPTIONS) {
-    const hay = `${o.code} ${o.category} ${o.name} ${o.property}`.toLowerCase();
-    if (filter && !hay.includes(filter)) continue;
-    const tr = document.createElement('tr');
-    const value = current.get(o.code) ?? o.default;
-    if (value !== o.default) tr.classList.add('changed');
-    tr.innerHTML = `<td class="code">${o.code}</td><td>${o.category}</td><td>${o.name}</td><td class="code">${o.property}</td><td></td><td class="code">${o.default}</td>`;
-    const select = document.createElement('select');
-    for (const v of o.values) {
-      const opt = document.createElement('option'); opt.value = v; opt.textContent = v; if (v === value) opt.selected = true; select.appendChild(opt);
-    }
-    select.addEventListener('change', () => { current.set(o.code, select.value); encodeCurrent(); renderTable(); });
-    tr.children[4].appendChild(select);
-    body.appendChild(tr);
+function makeTab(label, count, changed, active) {
+  const tab = document.createElement('button');
+  tab.type = 'button';
+  tab.className = active ? 'tab active' : 'tab';
+  tab.dataset.category = label;
+  tab.innerHTML = `${label} <span class="count">${count}</span>${changed ? ` <span class="changed-dot">${changed}</span>` : ''}`;
+  tab.addEventListener('click', () => {
+    activeCategory = label;
+    renderAll();
+  });
+  return tab;
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('categoryTabs');
+  tabs.innerHTML = '';
+  const totalChanged = OPTIONS.filter(isChanged).length;
+  tabs.appendChild(makeTab('All', OPTIONS.length, totalChanged, activeCategory === 'All'));
+  for (const cat of CATEGORIES) {
+    const list = OPTIONS.filter(o => o.category === cat);
+    const changed = list.filter(isChanged).length;
+    tabs.appendChild(makeTab(cat, list.length, changed, activeCategory === cat));
   }
-  if (unknownBlocks.length) {
-    for (const u of unknownBlocks) {
-      const tr = document.createElement('tr'); tr.className = 'unknown';
-      tr.innerHTML = `<td class="code">${u.block}</td><td>Unknown</td><td>Unknown option ${u.pair} / id ${u.id}</td><td class="code">?</td><td class="code">value index ${LETTERS.indexOf(u.valCode)}</td><td>?</td>`;
-      body.appendChild(tr);
+}
+
+function renderCategories() {
+  const filter = (document.getElementById('filter').value || '').toLowerCase().trim();
+  const root = document.getElementById('categories');
+  root.innerHTML = '';
+  let visibleSettings = 0;
+  let visibleCategories = 0;
+
+  for (const cat of CATEGORIES) {
+    if (activeCategory !== 'All' && activeCategory !== cat) continue;
+    const options = OPTIONS.filter(o => o.category === cat && optionMatchesFilter(o, filter));
+    if (!options.length) continue;
+    visibleCategories++;
+    visibleSettings += options.length;
+
+    const changed = options.filter(isChanged).length;
+    const panel = document.createElement('section');
+    panel.className = 'category-panel';
+
+    const head = document.createElement('div');
+    head.className = 'category-head';
+    head.innerHTML = `<h3>${cat}</h3><div class="category-meta"><span class="pill">${options.length} visible</span><span class="pill">${changed} changed</span></div>`;
+    panel.appendChild(head);
+
+    const grid = document.createElement('div');
+    grid.className = 'settings-grid';
+    for (const o of options) {
+      grid.appendChild(makeSettingCard(o));
     }
+    panel.appendChild(grid);
+    root.appendChild(panel);
   }
+
+  if (!visibleSettings) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-note';
+    empty.textContent = 'No settings match this filter.';
+    root.appendChild(empty);
+  }
+
+  document.getElementById('visibleCount').textContent = String(visibleSettings);
+  document.getElementById('categoryCount').textContent = String(visibleCategories);
+}
+
+
+function prettyValue(o, value) {
+  if (value === undefined || value === null) return '';
+  const raw = String(value);
+  if (o.property === 'QuestProgressionDailyLimit' && raw === '-1') return 'Unlimited';
+  if (o.property === 'TraderBuyLimit' && raw === '0') return 'None';
+  if (o.property === 'BiomeEnemyDensity') {
+    return {'0':'Default', '1':'Very Low', '2':'Low', '3':'Normal', '4':'High', '5':'Very High'}[raw] || raw;
+  }
+  if (o.property === 'HeatMapSensitivity') {
+    return {'0':'Off', '0.25':'Very Low', '0.5':'Low', '1':'Normal', '1.5':'High', '2':'Very High'}[raw] || raw;
+  }
+  if (o.type === 'Bool') return raw === 'True' ? 'Yes' : 'No';
+  if (o.type === 'Float') {
+    const n = Number(raw);
+    if (Number.isFinite(n)) return `${Math.round(n * 100)}%`;
+  }
+  return raw;
+}
+
+function makeSettingCard(o) {
+  const value = current.get(o.code) ?? o.default;
+  const card = document.createElement('article');
+  card.className = isChanged(o) ? 'setting-card changed' : 'setting-card';
+  card.title = `${o.name} / ${o.property} / ${o.code} / ID ${o.id}`;
+
+  const line = document.createElement('div');
+  line.className = 'setting-line';
+
+  const label = document.createElement('span');
+  label.className = 'setting-name';
+  label.textContent = o.name;
+  line.appendChild(label);
+
+  const sep = document.createElement('span');
+  sep.className = 'setting-sep';
+  sep.textContent = ':';
+  line.appendChild(sep);
+
+  const select = document.createElement('select');
+  select.setAttribute('aria-label', `${o.name} value`);
+  for (const v of o.values) {
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = prettyValue(o, v);
+    opt.title = v;
+    if (v === value) opt.selected = true;
+    select.appendChild(opt);
+  }
+  select.addEventListener('change', () => {
+    current.set(o.code, select.value);
+    renderAll();
+    encodeCurrent();
+  });
+  line.appendChild(select);
+  card.appendChild(line);
+
+  const idx = o.values.indexOf(value);
+  const meta = document.createElement('div');
+  meta.className = 'setting-meta-line';
+  meta.textContent = `${o.property} · ${o.code} · ID ${o.id} · default ${prettyValue(o, o.default)} · value code ${idx >= 0 ? valueIndexToCode(idx) : '?'}`;
+  card.appendChild(meta);
+  return card;
+}
+
+function renderUnknowns() {
+  const root = document.getElementById('unknowns');
+  root.innerHTML = '';
+  if (!unknownBlocks.length) return;
+  const box = document.createElement('section');
+  box.className = 'unknown-box';
+  box.innerHTML = `<strong>Unknown blocks</strong><div class="unknown-list"></div>`;
+  const list = box.querySelector('.unknown-list');
+  for (const u of unknownBlocks) {
+    const row = document.createElement('div');
+    row.className = 'unknown-row';
+    row.innerHTML = `<span class="mono"><b>${u.block}</b></span> — unknown option <span class="mono">${u.pair}</span> / id <span class="mono">${u.id}</span>, value index <span class="mono">${LETTERS.indexOf(u.valCode)}</span>`;
+    list.appendChild(row);
+  }
+  root.appendChild(box);
+}
+
+function updateSummary() {
+  document.getElementById('knownCount').textContent = String(OPTIONS.filter(isChanged).length);
+  document.getElementById('unknownCount').textContent = String(unknownBlocks.length);
+}
+
+function renderAll() {
+  renderTabs();
+  renderCategories();
+  renderUnknowns();
+  updateSummary();
 }
 
 document.getElementById('decodeBtn').addEventListener('click', decodeInput);
+document.getElementById('sampleBtn').addEventListener('click', () => { document.getElementById('inputCode').value = SAMPLE_CODE; decodeInput(); });
 document.getElementById('resetBtn').addEventListener('click', () => { document.getElementById('inputCode').value = 'A'; resetDefaults(); setStatus('Reset to defaults.'); });
-document.getElementById('sampleBtn').addEventListener('click', () => { document.getElementById('inputCode').value = 'AAAGABGACGADGARJAMJBUEBHIBOACDACVDCFBCHCCOHDAGDKKEHKFFAETA'; decodeInput(); });
-document.getElementById('copyBtn').addEventListener('click', async () => { await navigator.clipboard.writeText(document.getElementById('outputCode').value); setStatus('Copied generated code.'); });
-document.getElementById('filter').addEventListener('input', renderTable);
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const value = document.getElementById('outputCode').value;
+  try {
+    await navigator.clipboard.writeText(value);
+    setStatus('Copied generated code.');
+  } catch (err) {
+    document.getElementById('outputCode').focus();
+    document.getElementById('outputCode').select();
+    setStatus('Clipboard permission was blocked. The generated code is selected for manual copy.', true);
+  }
+});
+document.getElementById('filter').addEventListener('input', renderAll);
 document.getElementById('keepUnknown').addEventListener('change', encodeCurrent);
+document.getElementById('showAllBtn').addEventListener('click', () => { activeCategory = 'All'; renderAll(); });
+
 decodeInput();
 </script>
 </body>
