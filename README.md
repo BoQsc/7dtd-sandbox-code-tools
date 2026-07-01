@@ -68,19 +68,18 @@ The tests check:
 - default encoding returns `A`;
 - simple `--set` encoding works;
 - the sample code decodes known blocks;
-- unknown block `EHK` is preserved;
+- `EHK` decodes as `BookLootCount=2` / 200%;
 - decode -> JSON -> encode can roundtrip the sample code.
 
 ## Known limitation
 
 The bundled mapping is based on public references and is not guaranteed to match every future game build. Unknown blocks are still preserved, but their setting names and values cannot be displayed until the mapping is updated.
 
+`EH` / option id `111` is included as **Book Abundance / `BookLootCount`**. This is not from the older 150-option report; it is inferred from newer/current public generators that list 151 settings and include Book Abundance after Magazine Abundance, together with a real observed `EHK` block whose `K` value index matches 200% in the shared loot-abundance value list. Verify against the exact game build if you need absolute certainty.
+
 Known missing public mapping at package time:
 
-- `EH` / option id `111`
 - `EI` / option id `112`
-
-That is why a block like `EHK` is preserved but shown as unknown.
 
 ## Project files
 

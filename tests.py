@@ -28,7 +28,7 @@ def main() -> int:
     assert decoded["blocks"][0]["property"] == "RangedDamage"
     assert decoded["blocks"][0]["value"] == "0.85"
     assert any(row.get("property") == "IncomingDamage" and row.get("value") == "1.5" for row in decoded["blocks"])
-    assert any((not row["known"]) and row["block"] == "EHK" for row in decoded["blocks"])
+    assert any(row.get("property") == "BookLootCount" and row.get("value") == "2" for row in decoded["blocks"])
 
     tmp = ROOT / "examples" / "sample_decoded.json"
     tmp.write_text(json.dumps(decoded, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

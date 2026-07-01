@@ -248,14 +248,14 @@
       "option_code": "EH",
       "value_code": "K",
       "value_index": 10,
-      "known": false,
-      "category": "Unknown",
-      "name": "Unknown option EH",
-      "property": null,
-      "type": null,
-      "default": null,
-      "value": null,
-      "warning": "Option id is not in data/sandbox_options.json."
+      "known": true,
+      "category": "Resources",
+      "name": "Book Abundance",
+      "property": "BookLootCount",
+      "type": "Float",
+      "default": "1",
+      "value": "2",
+      "is_default": false
     },
     {
       "block": "FFA",

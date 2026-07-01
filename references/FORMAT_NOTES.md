@@ -34,3 +34,9 @@ A
 ```
 
 Unknown blocks should be preserved rather than discarded, because the table can be incomplete or game builds can change.
+
+## Mapping note: `EH` / `EHK`
+
+The older public technical report does not list `EH` / option id `111`. Newer/current public generators list 151 settings and include **Book Abundance** / `BookLootCount` after **Magazine Abundance** / `CraftingMagazinesLootCount`.
+
+This package maps `EH` to `BookLootCount`. Therefore `EHK` decodes as value index `K` = `2` = 200% in the loot-abundance value list. Treat this as an interoperability inference unless you verify it against your exact game build.

@@ -1787,6 +1787,33 @@
   },
   {
     "category": "Resources",
+    "name": "Book Abundance",
+    "property": "BookLootCount",
+    "id": 111,
+    "code": "EH",
+    "type": "Float",
+    "default": "1",
+    "values": [
+      "0",
+      "0.25",
+      "0.35",
+      "0.5",
+      "0.65",
+      "0.75",
+      "0.85",
+      "1",
+      "1.25",
+      "1.5",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "order": 90,
+    "source_note": "Inferred: current public generators list Book Abundance / BookLootCount after Magazine Abundance; observed block EHK uses value index K, matching 200% in the shared loot abundance value list. Verify against the exact game build if needed."
+  },
+  {
+    "category": "Resources",
     "name": "Treasure Map Chance",
     "property": "TreasureMapChance",
     "id": 89,
@@ -1810,7 +1837,7 @@
       "2",
       "3"
     ],
-    "order": 90
+    "order": 91
   },
   {
     "category": "Resources",
@@ -1836,7 +1863,7 @@
       "4",
       "5"
     ],
-    "order": 91
+    "order": 92
   },
   {
     "category": "Resources",
@@ -1862,7 +1889,7 @@
       "4",
       "5"
     ],
-    "order": 92
+    "order": 93
   },
   {
     "category": "Resources",
@@ -1888,7 +1915,7 @@
       "4",
       "5"
     ],
-    "order": 93
+    "order": 94
   },
   {
     "category": "Resources",
@@ -1914,7 +1941,7 @@
       "4",
       "5"
     ],
-    "order": 94
+    "order": 95
   },
   {
     "category": "Resources",
@@ -1935,7 +1962,7 @@
       "2",
       "3"
     ],
-    "order": 95
+    "order": 96
   },
   {
     "category": "Crafting",
@@ -1949,7 +1976,7 @@
       "False",
       "True"
     ],
-    "order": 96
+    "order": 97
   },
   {
     "category": "Crafting",
@@ -1967,7 +1994,7 @@
       "5",
       "6"
     ],
-    "order": 97
+    "order": 98
   },
   {
     "category": "Crafting",
@@ -1987,7 +2014,7 @@
       "6",
       "7"
     ],
-    "order": 98
+    "order": 99
   },
   {
     "category": "Crafting",
@@ -2003,7 +2030,7 @@
       "2",
       "3"
     ],
-    "order": 99
+    "order": 100
   },
   {
     "category": "Crafting",
@@ -2017,7 +2044,7 @@
       "False",
       "True"
     ],
-    "order": 100
+    "order": 101
   },
   {
     "category": "Crafting",
@@ -2031,7 +2058,7 @@
       "False",
       "True"
     ],
-    "order": 101
+    "order": 102
   },
   {
     "category": "Crafting",
@@ -2052,7 +2079,7 @@
       "2",
       "3"
     ],
-    "order": 102
+    "order": 103
   },
   {
     "category": "Crafting",
@@ -2073,7 +2100,7 @@
       "2",
       "3"
     ],
-    "order": 103
+    "order": 104
   },
   {
     "category": "Crafting",
@@ -2093,7 +2120,7 @@
       "2",
       "3"
     ],
-    "order": 104
+    "order": 105
   },
   {
     "category": "Crafting",
@@ -2114,7 +2141,7 @@
       "2",
       "3"
     ],
-    "order": 105
+    "order": 106
   },
   {
     "category": "Crafting",
@@ -2135,7 +2162,7 @@
       "2",
       "3"
     ],
-    "order": 106
+    "order": 107
   },
   {
     "category": "Crafting",
@@ -2152,7 +2179,7 @@
       "4",
       "5"
     ],
-    "order": 107
+    "order": 108
   },
   {
     "category": "Crafting",
@@ -2168,7 +2195,7 @@
       "2",
       "3"
     ],
-    "order": 108
+    "order": 109
   },
   {
     "category": "Crafting",
@@ -2189,7 +2216,7 @@
       "2",
       "3"
     ],
-    "order": 109
+    "order": 110
   },
   {
     "category": "Crafting",
@@ -2206,7 +2233,7 @@
       "4",
       "5"
     ],
-    "order": 110
+    "order": 111
   },
   {
     "category": "Crafting",
@@ -2227,7 +2254,7 @@
       "2",
       "3"
     ],
-    "order": 111
+    "order": 112
   },
   {
     "category": "Crafting",
@@ -2245,7 +2272,7 @@
       "1.5",
       "2"
     ],
-    "order": 112
+    "order": 113
   },
   {
     "category": "Crafting",
@@ -2261,7 +2288,7 @@
       "2",
       "3"
     ],
-    "order": 113
+    "order": 114
   },
   {
     "category": "Crafting",
@@ -2279,7 +2306,7 @@
       "0.2",
       "0.25"
     ],
-    "order": 114
+    "order": 115
   },
   {
     "category": "Traders",
@@ -2293,7 +2320,7 @@
       "False",
       "True"
     ],
-    "order": 115
+    "order": 116
   },
   {
     "category": "Traders",
@@ -2307,7 +2334,7 @@
       "False",
       "True"
     ],
-    "order": 116
+    "order": 117
   },
   {
     "category": "Traders",
@@ -2326,7 +2353,7 @@
       "5",
       "6"
     ],
-    "order": 117
+    "order": 118
   },
   {
     "category": "Traders",
@@ -2341,7 +2368,7 @@
       "1",
       "2"
     ],
-    "order": 118
+    "order": 119
   },
   {
     "category": "Traders",
@@ -2355,7 +2382,7 @@
       "False",
       "True"
     ],
-    "order": 119
+    "order": 120
   },
   {
     "category": "Traders",
@@ -2372,7 +2399,7 @@
       "1.5",
       "2"
     ],
-    "order": 120
+    "order": 121
   },
   {
     "category": "Traders",
@@ -2390,7 +2417,7 @@
       "5",
       "6"
     ],
-    "order": 121
+    "order": 122
   },
   {
     "category": "Traders",
@@ -2407,7 +2434,7 @@
       "1.5",
       "2"
     ],
-    "order": 122
+    "order": 123
   },
   {
     "category": "Traders",
@@ -2424,7 +2451,7 @@
       "1.5",
       "2"
     ],
-    "order": 123
+    "order": 124
   },
   {
     "category": "Traders",
@@ -2445,7 +2472,7 @@
       "7",
       "14"
     ],
-    "order": 124
+    "order": 125
   },
   {
     "category": "Traders",
@@ -2466,7 +2493,7 @@
       "7",
       "14"
     ],
-    "order": 125
+    "order": 126
   },
   {
     "category": "Traders",
@@ -2489,7 +2516,7 @@
       "3",
       "4"
     ],
-    "order": 126
+    "order": 127
   },
   {
     "category": "Traders",
@@ -2512,7 +2539,7 @@
       "3",
       "4"
     ],
-    "order": 127
+    "order": 128
   },
   {
     "category": "Traders",
@@ -2535,7 +2562,7 @@
       "9",
       "10"
     ],
-    "order": 128
+    "order": 129
   },
   {
     "category": "Tasks",
@@ -2549,7 +2576,7 @@
       "False",
       "True"
     ],
-    "order": 129
+    "order": 130
   },
   {
     "category": "Tasks",
@@ -2563,7 +2590,7 @@
       "False",
       "True"
     ],
-    "order": 130
+    "order": 131
   },
   {
     "category": "Tasks",
@@ -2577,7 +2604,7 @@
       "False",
       "True"
     ],
-    "order": 131
+    "order": 132
   },
   {
     "category": "Tasks",
@@ -2591,7 +2618,7 @@
       "False",
       "True"
     ],
-    "order": 132
+    "order": 133
   },
   {
     "category": "Tasks",
@@ -2605,7 +2632,7 @@
       "False",
       "True"
     ],
-    "order": 133
+    "order": 134
   },
   {
     "category": "Tasks",
@@ -2619,7 +2646,7 @@
       "False",
       "True"
     ],
-    "order": 134
+    "order": 135
   },
   {
     "category": "Tasks",
@@ -2633,7 +2660,7 @@
       "False",
       "True"
     ],
-    "order": 135
+    "order": 136
   },
   {
     "category": "Tasks",
@@ -2661,7 +2688,7 @@
       "14",
       "15"
     ],
-    "order": 136
+    "order": 137
   },
   {
     "category": "Tasks",
@@ -2684,7 +2711,7 @@
       "9",
       "10"
     ],
-    "order": 137
+    "order": 138
   },
   {
     "category": "Tasks",
@@ -2707,7 +2734,7 @@
       "9",
       "10"
     ],
-    "order": 138
+    "order": 139
   },
   {
     "category": "Misc",
@@ -2732,7 +2759,7 @@
       "2.5",
       "3"
     ],
-    "order": 139
+    "order": 140
   },
   {
     "category": "Misc",
@@ -2757,7 +2784,7 @@
       "2.5",
       "3"
     ],
-    "order": 140
+    "order": 141
   },
   {
     "category": "Misc",
@@ -2782,7 +2809,7 @@
       "2.5",
       "3"
     ],
-    "order": 141
+    "order": 142
   },
   {
     "category": "Misc",
@@ -2807,7 +2834,7 @@
       "2.5",
       "3"
     ],
-    "order": 142
+    "order": 143
   },
   {
     "category": "Misc",
@@ -2827,7 +2854,7 @@
       "2",
       "3"
     ],
-    "order": 143
+    "order": 144
   },
   {
     "category": "Misc",
@@ -2842,7 +2869,7 @@
       "1",
       "2"
     ],
-    "order": 144
+    "order": 145
   },
   {
     "category": "Misc",
@@ -2856,7 +2883,7 @@
       "False",
       "True"
     ],
-    "order": 145
+    "order": 146
   },
   {
     "category": "Misc",
@@ -2870,7 +2897,7 @@
       "False",
       "True"
     ],
-    "order": 146
+    "order": 147
   },
   {
     "category": "Misc",
@@ -2888,7 +2915,7 @@
       "0.9",
       "1"
     ],
-    "order": 147
+    "order": 148
   },
   {
     "category": "Misc",
@@ -2902,7 +2929,7 @@
       "False",
       "True"
     ],
-    "order": 148
+    "order": 149
   },
   {
     "category": "Misc",
@@ -2916,6 +2943,6 @@
       "False",
       "True"
     ],
-    "order": 149
+    "order": 150
   }
 ]
